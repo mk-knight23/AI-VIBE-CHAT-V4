@@ -1,8 +1,50 @@
-# AI API Providers
+# 📊 AI-VIBE-CHAT-V4
+
+<p align="center">
+  <img src="https://img.shields.io/badge/AI--VIBE-CHAT--V4-blue?style=for-the-badge&logo=next.js&logoColor=white" alt="AI Vibe Project">
+  <br>
+  <b>AI API Providers Showcase - 30+ Providers, Benchmarks, and Interactive Tools.</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-15.0+-black.svg?logo=next.js&logoColor=white" alt="Next.js 15">
+  <img src="https://img.shields.io/badge/React-19.0+-61DAFB.svg?logo=react&logoColor=white" alt="React 19">
+  <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC.svg?logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+</p>
+
+---
 
 A comprehensive, production-ready Next.js 15 application showcasing **30 AI API providers** with advanced features including interactive charts, pricing calculator, benchmarks dashboard, and API playground.
 
-## Features
+---
+
+## 🗺️ Quick Navigation
+
+- [✨ Features](#-features)
+- [🛠️ Technologies Used](#%EF%B8%8F-technologies-used)
+- [🚀 Getting Started](#-getting-started)
+- [🌐 Deployment](#-deployment)
+- [🧪 Testing](#-testing)
+- [📂 Project Structure](#%EF%B8%8F-project-structure)
+- [🤖 Providers Included](#-providers-included)
+- [📊 Data Structure](#-data-structure)
+
+---
+
+## 🛠️ Engineered With
+
+<p align="left">
+  <a href="https://nextjs.org"><img src="https://skillicons.dev/icons?i=nextjs" alt="Next.js"></a>
+  <a href="https://react.dev"><img src="https://skillicons.dev/icons?i=react" alt="React"></a>
+  <a href="https://tailwindcss.com"><img src="https://skillicons.dev/icons?i=tailwind" alt="Tailwind CSS"></a>
+  <a href="https://typescriptlang.org"><img src="https://skillicons.dev/icons?i=ts" alt="TypeScript"></a>
+  <a href="https://recharts.org"><img src="https://img.shields.io/badge/Charts-Recharts-22b5bf" alt="Recharts"></a>
+</p>
+
+---
+
+## ✨ Features
 
 ### Core Features
 - **Modern Design**: Dark-mode compatible UI built with Tailwind CSS with gradient accents
@@ -42,7 +84,9 @@ A comprehensive, production-ready Next.js 15 application showcasing **30 AI API 
 - **SEO Optimized**: Metadata and semantic HTML for better search engine visibility
 - **Static Generation**: Fast page loads with Next.js App Router
 
-## Technologies Used
+---
+
+## 🛠️ Technologies Used
 
 - **Next.js 15**: React framework with App Router
 - **TypeScript**: Type-safe development
@@ -53,23 +97,21 @@ A comprehensive, production-ready Next.js 15 application showcasing **30 AI API 
 - **Framer Motion**: Smooth animations (ready to integrate)
 - **Fuse.js**: Fuzzy search (ready to integrate)
 
-## Getting Started
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-
 - Node.js 18+ installed
 - npm, yarn, or pnpm package manager
 
 ### Installation
-
 1. Install dependencies:
-
 ```bash
 npm install
 ```
 
 2. Run the development server:
-
 ```bash
 npm run dev
 ```
@@ -77,16 +119,16 @@ npm run dev
 3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Build for Production
-
 ```bash
 npm run build
 npm start
 ```
 
-## Deployment
+---
+
+## 🌐 Deployment
 
 ### Quick Deploy to Vercel
-
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -101,88 +143,41 @@ Or use the deployment script:
 ```
 
 ### Deploy via GitHub
-
 1. Push to GitHub:
 ```bash
 git remote add origin https://github.com/YOUR_USERNAME/ai-api-providers.git
 git push -u origin main
 ```
-
 2. Import on [Vercel](https://vercel.com/new)
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
 
-## Testing
+---
+
+## 🧪 Testing
 
 Run the test checklist:
 ```bash
 npm run build  # Verify build succeeds
 ```
-
 See [TESTING.md](TESTING.md) for comprehensive testing guide.
 
-## Getting Started
+---
 
-### Prerequisites
-
-- Node.js 18+ installed
-- npm, yarn, or pnpm package manager
-
-### Installation
-
-1. Install dependencies:
-
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-```
-
-2. Run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-### Build for Production
-
-```bash
-npm run build
-npm start
-```
-
-## Project Structure
+## 📂 Project Structure
 
 ```
 ├── app/
 │   ├── [slug]/          # Dynamic provider detail pages
-│   │   └── page.tsx
 │   ├── about/           # About page
-│   │   └── page.tsx
 │   ├── benchmarks/      # Performance benchmarks page
-│   │   └── page.tsx
 │   ├── calculator/      # Pricing calculator page
-│   │   └── page.tsx
 │   ├── compare/         # Compare providers page
-│   │   └── page.tsx
 │   ├── contact/         # Contact page
-│   │   └── page.tsx
 │   ├── market-overview/ # Market insights dashboard
-│   │   └── page.tsx
 │   ├── playground/      # API playground (mocked)
-│   │   └── page.tsx
 │   ├── providers/       # All providers with filters
-│   │   └── page.tsx
 │   ├── sources/         # References and citations
-│   │   └── page.tsx
 │   ├── globals.css      # Global styles
 │   ├── layout.tsx       # Root layout with navigation
 │   └── page.tsx         # Home page with search
@@ -195,7 +190,9 @@ npm start
 └── tsconfig.json
 ```
 
-## Providers Included
+---
+
+## 🤖 Providers Included
 
 The application includes detailed information for **30 AI API providers**:
 
@@ -230,10 +227,9 @@ The application includes detailed information for **30 AI API providers**:
 - xAI (Grok)
 - **NEW: Cohere, Together AI, Replicate, Hugging Face, Perplexity AI, AI21 Labs**
 
-## Data Structure
+### Data Structure
 
 Each provider includes:
-
 - Name and description
 - Use cases
 - Documentation links
@@ -244,7 +240,9 @@ Each provider includes:
 - Setup instructions
 - Additional details
 
-## Customization
+---
+
+## 📊 Data Structure (TypeScript)
 
 To add or modify providers, edit `/data/providers.ts`. The data structure is:
 
@@ -264,17 +262,44 @@ To add or modify providers, edit `/data/providers.ts`. The data structure is:
 }
 ```
 
-## Technologies Used
+---
 
-- **Next.js 15**: React framework with App Router
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first CSS framework
-- **React 19**: Latest React features
+## 🔒 Security Status
 
-## License
+**Last Security Audit:** February 20, 2026
+**Status:** ✅ Fully Secured
+
+### Security Fixes Applied
+| Issue | Status | Details |
+|-------|--------|---------|
+| Next.js Vulnerabilities | ✅ Fixed | Upgraded from 15.0.7 to 15.1.8+ |
+| API Key Exposure | ✅ Fixed | Server-side storage implemented |
+| Client-to-API Calls | ✅ Fixed | Server proxy added |
+| Missing Security Headers | ✅ Fixed | CSP + headers configured |
+| Input Validation | ✅ Fixed | Zod schemas on all routes |
+
+### React/Next.js Best Practices Applied
+- ✅ Server-side rendering (SSR)
+- ✅ Static generation for better performance
+- ✅ TypeScript strict mode
+- ✅ Environment variable validation
+- ✅ Error boundaries for graceful failures
+- ✅ Security headers (CSP, X-Frame-Options)
+- ✅ No client-side API keys
+- ✅ Proper error handling (no info leakage)
+
+---
+
+## 📄 License
 
 This project is open source and available for educational purposes.
 
-## Disclaimer
+## ⚠️ Disclaimer
 
 Pricing and features are subject to change. Always verify current information on official provider websites before making decisions.
+
+---
+
+<p align="center">
+  <i>AI-VIBE-CHAT-V4 - The Ultimate AI Provider Hub</i>
+</p>

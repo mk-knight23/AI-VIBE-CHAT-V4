@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PROVIDERS, getProvider, getApiKeySteps } from "@/lib/registry";
-import { Play, Copy, Check, Settings, AlertCircle, CheckCircle, ExternalLink, HelpCircle } from "lucide-react";
+import { PROVIDERS, getProvider } from "@/lib/registry";
+import { Play, Copy, Check, Settings, AlertCircle, Info } from "lucide-react";
 
 export default function Playground() {
   const [selectedProviderId, setSelectedProviderId] = useState("openai");
   const [selectedModelId, setSelectedModelId] = useState("");
-  const [apiKey, setApiKey] = useState("");
-  const [baseUrl, setBaseUrl] = useState("");
   const [prompt, setPrompt] = useState("Hello! Can you introduce yourself?");
   const [temperature, setTemperature] = useState(0.7);
   const [maxTokens, setMaxTokens] = useState(500);
@@ -17,15 +15,10 @@ export default function Playground() {
   const [response, setResponse] = useState("");
   const [copied, setCopied] = useState(false);
   const [showSettings, setShowSettings] = useState(true);
-  const [keyValidated, setKeyValidated] = useState(false);
-  const [validating, setValidating] = useState(false);
-  const [validationError, setValidationError] = useState("");
-  const [configured, setConfigured] = useState(false);
-  const [showKeyHelp, setShowKeyHelp] = useState(false);
+  const [error, setError] = useState("");
 
   const provider = getProvider(selectedProviderId);
   const availableModels = provider?.models || [];
-  const keySteps = getApiKeySteps(selectedProviderId);
 
   useEffect(() => {
     if (availableModels.length > 0 && !selectedModelId) {
@@ -33,195 +26,48 @@ export default function Playground() {
     }
   }, [selectedProviderId, availableModels, selectedModelId]);
 
+  // Update prompt based on mode
   useEffect(() => {
-    if (provider) {
-      setBaseUrl(provider.baseUrl);
-      setKeyValidated(false);
-      setConfigured(false);
+    if (mode === "code") {
+      setPrompt("Write a Python function to reverse a string.");
+    } else if (mode === "summarize") {
+      setPrompt("Summarize the benefits of using TypeScript in web development.");
+    } else {
+      setPrompt("Hello! Can you introduce yourself?");
     }
-  }, [selectedProviderId, provider]);
-
-  const validateApiKey = async () => {
-    if (!provider) return;
-
-    if (provider.requiresApiKey && !apiKey.trim()) {
-      setValidationError("API key is required");
-      return;
-    }
-
-    if (provider.requiresBaseUrl && !baseUrl.trim()) {
-      setValidationError("Base URL is required");
-      return;
-    }
-
-    setValidating(true);
-    setValidationError("");
-
-    try {
-      // Test API call based on provider
-      let testUrl = "";
-      let headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-
-      if (provider.id === "openai" || provider.id === "groq" || provider.id === "deepseek" || provider.id === "megallm" || 
-          provider.id === "mistral" || provider.id === "fireworks" || provider.id === "xai" || provider.id === "cohere" ||
-          provider.id === "together" || provider.id === "huggingface") {
-        testUrl = `${baseUrl}/models`;
-        headers["Authorization"] = `Bearer ${apiKey}`;
-      } else if (provider.id === "anthropic") {
-        testUrl = `${baseUrl}/messages`;
-        headers["x-api-key"] = apiKey;
-        headers["anthropic-version"] = "2023-06-01";
-      } else if (provider.id === "google") {
-        testUrl = `${baseUrl}/models?key=${apiKey}`;
-      } else if (provider.id === "openrouter") {
-        testUrl = `${baseUrl}/models`;
-        headers["Authorization"] = `Bearer ${apiKey}`;
-      } else if (provider.id === "ollama") {
-        testUrl = `${baseUrl}/api/tags`;
-      } else {
-        // Generic validation
-        setKeyValidated(true);
-        setConfigured(true);
-        setValidating(false);
-        return;
-      }
-
-      const response = await fetch(testUrl, {
-        method: "GET",
-        headers,
-      });
-
-      if (response.ok) {
-        setKeyValidated(true);
-        setConfigured(true);
-        setValidationError("");
-      } else {
-        setKeyValidated(false);
-        setValidationError(`Validation failed: ${response.status} ${response.statusText}`);
-      }
-    } catch (error) {
-      setKeyValidated(false);
-      setValidationError(`Connection error: ${error instanceof Error ? error.message : "Unknown error"}`);
-    } finally {
-      setValidating(false);
-    }
-  };
+  }, [mode]);
 
   const handleRun = async () => {
-    if (!configured) {
-      setValidationError("Please configure and test your API settings first");
-      return;
-    }
-
     if (!provider || !selectedModelId) return;
 
     setLoading(true);
     setResponse("");
-    setValidationError("");
+    setError("");
 
     try {
-      let apiUrl = "";
-      let headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      let body: any = {};
-
-      // Build request based on provider
-      if (provider.id === "openai" || provider.id === "groq" || provider.id === "deepseek" || provider.id === "openrouter" || 
-          provider.id === "megallm" || provider.id === "mistral" || provider.id === "fireworks" || provider.id === "xai" ||
-          provider.id === "together" || provider.id === "replicate" || provider.id === "perplexity" || provider.id === "ai21") {
-        apiUrl = `${baseUrl}/chat/completions`;
-        headers["Authorization"] = `Bearer ${apiKey}`;
-        body = {
-          model: selectedModelId,
-          messages: [{ role: "user", content: prompt }],
-          temperature,
-          max_tokens: maxTokens,
-        };
-      } else if (provider.id === "cohere") {
-        apiUrl = `${baseUrl}/chat`;
-        headers["Authorization"] = `Bearer ${apiKey}`;
-        body = {
-          model: selectedModelId,
-          message: prompt,
-          temperature,
-          max_tokens: maxTokens,
-        };
-      } else if (provider.id === "huggingface") {
-        apiUrl = `${baseUrl}/models/${selectedModelId}`;
-        headers["Authorization"] = `Bearer ${apiKey}`;
-        body = {
-          inputs: prompt,
-          parameters: {
-            temperature,
-            max_new_tokens: maxTokens,
-          },
-        };
-      } else if (provider.id === "anthropic") {
-        apiUrl = `${baseUrl}/messages`;
-        headers["x-api-key"] = apiKey;
-        headers["anthropic-version"] = "2023-06-01";
-        body = {
-          model: selectedModelId,
-          messages: [{ role: "user", content: prompt }],
-          temperature,
-          max_tokens: maxTokens,
-        };
-      } else if (provider.id === "google") {
-        apiUrl = `${baseUrl}/models/${selectedModelId}:generateContent?key=${apiKey}`;
-        body = {
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature,
-            maxOutputTokens: maxTokens,
-          },
-        };
-      } else if (provider.id === "ollama") {
-        apiUrl = `${baseUrl}/api/chat`;
-        body = {
-          model: selectedModelId,
-          messages: [{ role: "user", content: prompt }],
-          stream: false,
-        };
-      }
-
-      const apiResponse = await fetch(apiUrl, {
+      const response = await fetch("/api/proxy", {
         method: "POST",
-        headers,
-        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          provider: provider.id,
+          model: selectedModelId,
+          prompt,
+          temperature,
+          maxTokens,
+        }),
       });
 
-      if (!apiResponse.ok) {
-        throw new Error(`API Error: ${apiResponse.status} ${apiResponse.statusText}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.error || `API Error: ${response.status}`);
       }
 
-      const data = await apiResponse.json();
-
-      // Extract response based on provider
-      let extractedResponse = "";
-      if (provider.id === "openai" || provider.id === "groq" || provider.id === "deepseek" || provider.id === "openrouter" || 
-          provider.id === "megallm" || provider.id === "mistral" || provider.id === "fireworks" || provider.id === "xai" ||
-          provider.id === "together" || provider.id === "replicate" || provider.id === "perplexity" || provider.id === "ai21") {
-        extractedResponse = data.choices?.[0]?.message?.content || JSON.stringify(data, null, 2);
-      } else if (provider.id === "cohere") {
-        extractedResponse = data.text || JSON.stringify(data, null, 2);
-      } else if (provider.id === "huggingface") {
-        extractedResponse = Array.isArray(data) ? data[0]?.generated_text || JSON.stringify(data, null, 2) : JSON.stringify(data, null, 2);
-      } else if (provider.id === "anthropic") {
-        extractedResponse = data.content?.[0]?.text || JSON.stringify(data, null, 2);
-      } else if (provider.id === "google") {
-        extractedResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data, null, 2);
-      } else if (provider.id === "ollama") {
-        extractedResponse = data.message?.content || JSON.stringify(data, null, 2);
-      } else {
-        extractedResponse = JSON.stringify(data, null, 2);
-      }
-
-      setResponse(extractedResponse);
-    } catch (error) {
-      setResponse(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+      const data = await response.json();
+      setResponse(data.response || "No response content");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -238,7 +84,7 @@ export default function Playground() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-4xl font-bold mb-2">API Playground</h1>
-          <p className="text-gray-400">Test <span className="text-blue-400 font-semibold">30 AI providers</span> with real API calls</p>
+          <p className="text-gray-400">Test <span className="text-blue-400 font-semibold">30 AI providers</span> with server-side API calls</p>
         </div>
         <button
           onClick={() => setShowSettings(!showSettings)}
@@ -249,10 +95,24 @@ export default function Playground() {
         </button>
       </div>
 
+      {/* Security Notice */}
+      <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4 mb-6">
+        <div className="flex items-start gap-3">
+          <Info className="text-blue-400 mt-0.5 flex-shrink-0" size={18} />
+          <div>
+            <h3 className="text-blue-400 font-semibold mb-1">Server-Side API Proxy</h3>
+            <p className="text-sm text-gray-300">
+              API keys are stored securely on the server. Configure API keys via environment variables.
+              See the <code className="bg-gray-800 px-2 py-0.5 rounded text-xs">.env.example</code> file for details.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {showSettings && (
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 mb-6">
           <h2 className="text-xl font-bold mb-4 text-blue-400">Configuration</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium mb-2">Provider</label>
@@ -291,101 +151,13 @@ export default function Playground() {
           </div>
 
           {provider?.requiresApiKey && (
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium">API Key</label>
-                <button
-                  onClick={() => setShowKeyHelp(!showKeyHelp)}
-                  className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1"
-                >
-                  <HelpCircle size={14} />
-                  How to get API key?
-                </button>
-              </div>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => {
-                  setApiKey(e.target.value);
-                  setKeyValidated(false);
-                  setConfigured(false);
-                }}
-                placeholder="Enter your API key"
-                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              
-              {showKeyHelp && (
-                <div className="mt-3 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
-                  <h4 className="font-semibold mb-2 text-blue-400">Get your {provider.name} API Key:</h4>
-                  <ol className="list-decimal list-inside space-y-1 text-sm text-gray-300 mb-3">
-                    {keySteps.steps.map((step, i) => (
-                      <li key={i}>{step}</li>
-                    ))}
-                  </ol>
-                  <a
-                    href={keySteps.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm"
-                  >
-                    <ExternalLink size={14} />
-                    Visit {provider.name} →
-                  </a>
-                </div>
-              )}
+            <div className="p-3 bg-yellow-900/20 border border-yellow-700 rounded-lg">
+              <p className="text-sm text-yellow-300">
+                <strong>Note:</strong> This provider requires an API key configured on the server.
+                Set the <code className="bg-gray-800 px-1 rounded text-xs">{provider.id.toUpperCase()}_API_KEY</code> environment variable.
+              </p>
             </div>
           )}
-
-          {provider?.requiresBaseUrl && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Base URL</label>
-              <input
-                type="text"
-                value={baseUrl}
-                onChange={(e) => {
-                  setBaseUrl(e.target.value);
-                  setKeyValidated(false);
-                  setConfigured(false);
-                }}
-                placeholder="Enter base URL"
-                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          )}
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={validateApiKey}
-              disabled={validating}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white rounded transition-colors"
-            >
-              {validating ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Testing...
-                </>
-              ) : (
-                <>
-                  <Play size={16} />
-                  Test Connection
-                </>
-              )}
-            </button>
-
-            {keyValidated && (
-              <div className="flex items-center gap-2 text-green-400">
-                <CheckCircle size={18} />
-                <span className="text-sm">Connected successfully</span>
-              </div>
-            )}
-
-            {validationError && (
-              <div className="flex items-center gap-2 text-red-400">
-                <AlertCircle size={18} />
-                <span className="text-sm">{validationError}</span>
-              </div>
-            )}
-          </div>
         </div>
       )}
 
@@ -419,7 +191,7 @@ export default function Playground() {
 
             <button
               onClick={handleRun}
-              disabled={loading || !configured}
+              disabled={loading}
               className="mt-4 w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2"
             >
               {loading ? (
@@ -436,7 +208,17 @@ export default function Playground() {
             </button>
           </div>
 
-          {response && (
+          {error && (
+            <div className="bg-red-900/20 border border-red-700 rounded-lg p-6">
+              <div className="flex items-center gap-2 text-red-400 mb-2">
+                <AlertCircle size={18} />
+                <h3 className="font-semibold">Error</h3>
+              </div>
+              <p className="text-sm text-red-300">{error}</p>
+            </div>
+          )}
+
+          {response && !error && (
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-blue-400">Response</h3>
@@ -458,7 +240,7 @@ export default function Playground() {
         <div className="space-y-6">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4 text-blue-400">Parameters</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -508,10 +290,8 @@ export default function Playground() {
                 <span className="text-white text-xs">{availableModels.find(m => m.id === selectedModelId)?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Status:</span>
-                <span className={configured ? "text-green-400" : "text-yellow-400"}>
-                  {configured ? "Ready" : "Not Configured"}
-                </span>
+                <span className="text-gray-400">API Mode:</span>
+                <span className="text-green-400">Server-Side Proxy</span>
               </div>
             </div>
           </div>
