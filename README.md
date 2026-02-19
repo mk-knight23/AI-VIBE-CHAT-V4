@@ -166,6 +166,9 @@ See [TESTING.md](TESTING.md) for comprehensive testing guide.
 
 ## 📂 Project Structure
 
+<details>
+<summary>View Detailed Directory Map</summary>
+
 ```
 ├── app/
 │   ├── [slug]/          # Dynamic provider detail pages
@@ -189,6 +192,8 @@ See [TESTING.md](TESTING.md) for comprehensive testing guide.
 ├── tailwind.config.ts
 └── tsconfig.json
 ```
+</details>
+
 
 ---
 
